@@ -31,26 +31,36 @@
 
 package org.scijava.io;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 
 import org.junit.Test;
+import org.scijava.io.remote.HTTPLocation;
 
 /**
- * Tests {@link URLLocation}.
+ * Tests {@link HTTPLocation}.
  * 
  * @author Curtis Rueden
  */
-public class URLLocationTest {
+public class HTTPLocationTest {
 
-	/** Tests {@link URLLocation#URLLocation(URL)}. */
+	/**
+	 * Tests {@link HTTPLocation#HTTPLocation(URL)}.
+	 * 
+	 * @throws URISyntaxException
+	 */
 	@Test
-	public void testURL() throws MalformedURLException {
-		final URL url = new URL("file:///non/existent/url");
-		final URLLocation loc = new URLLocation(url);
+	public void testURL() throws MalformedURLException, URISyntaxException {
+		final URL url = new URL("http://www.scijava.org/_static/scijava.png");
+		final HTTPLocation loc = new HTTPLocation(url);
 		assertSame(url, loc.getURL());
+
+		assertEquals(url.toURI(), loc.getURI());
 	}
 
 }

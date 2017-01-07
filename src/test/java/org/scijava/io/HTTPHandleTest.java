@@ -2,7 +2,7 @@
  * #%L
  * SciJava Common shared library for SciJava software.
  * %%
- * Copyright (C) 2009 - 2017 Board of Regents of the University of
+ * Copyright (C) 2009 - 2016 Board of Regents of the University of
  * Wisconsin-Madison, Broad Institute of MIT and Harvard, and Max Planck
  * Institute of Molecular Cell Biology and Genetics.
  * %%
@@ -31,45 +31,32 @@
 
 package org.scijava.io;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
+import org.scijava.io.remote.HTTPHandle;
+import org.scijava.io.remote.HTTPLocation;
 
 /**
- * {@link Location} backed by a {@link URL}.
+ * Tests {@link HTTPHandle}.
  *
  * @author Curtis Rueden
  */
-public class URLLocation extends AbstractLocation {
+public class HTTPHandleTest extends DataHandleTest {
 
-	/** The URL backing this location. */
-	private final URL url;
-
-	public URLLocation(final URL url) {
-		this.url = url;
-	}
-
-	// -- URLLocation methods --
-
-	/** Gets the associated {@link URL}. */
-	public URL getURL() {
-		return url;
-	}
-
-	// -- Location methods --
-
-	/**
-	 * Gets the associated {@link URI}, or null if this URL is not formatted
-	 * strictly according to to RFC2396 and cannot be converted to a URI.
-	 */
 	@Override
-	public URI getURI() {
-		try {
-			return getURL().toURI();
-		}
-		catch (final URISyntaxException exc) {
-			return null;
-		}
+	public Class<? extends DataHandle<?>> getExpectedHandleType() {
+		return HTTPHandle.class;
+	}
+
+	@Override
+	public Location createLocation() throws IOException {
+		// create and populate a temp file
+		final File tmpFile = File.createTempFile("URLHandleTest", "test-url");
+		tmpFile.deleteOnExit();
+		populateData(new FileOutputStream(tmpFile));
+		return new HTTPLocation(tmpFile.toURI().toURL());
 	}
 
 }

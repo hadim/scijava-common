@@ -2,7 +2,7 @@
  * #%L
  * SciJava Common shared library for SciJava software.
  * %%
- * Copyright (C) 2009 - 2016 Board of Regents of the University of
+ * Copyright (C) 2009 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, Broad Institute of MIT and Harvard, and Max Planck
  * Institute of Molecular Cell Biology and Genetics.
  * %%
@@ -29,31 +29,68 @@
  * #L%
  */
 
-package org.scijava.io;
+package org.scijava.io.remote;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+
+import org.scijava.io.AbstractLocation;
+import org.scijava.io.Location;
 
 /**
- * Tests {@link URLHandle}.
+ * A {@link Location} that can be accessed via HTTP. backed by an {@link URL}.
  *
  * @author Curtis Rueden
+ * @author Gabriel Einsdorf
  */
-public class URLHandleTest extends DataHandleTest {
+public class HTTPLocation extends AbstractLocation {
 
-	@Override
-	public Class<? extends DataHandle<?>> getExpectedHandleType() {
-		return URLHandle.class;
+	/** The URL backing this location. */
+	private final URL url;
+
+	public HTTPLocation(final URL url) {
+		this.url = url;
 	}
 
+	/**
+	 * Creates an HTTPLocation from an URI.
+	 * 
+	 * @param uri the uri of the location
+	 * @throws MalformedURLException if the uri can not be converted to an URL, or
+	 *           the uri does not point to an HTTP(S) location.
+	 */
+	public HTTPLocation(final URI uri) throws MalformedURLException {
+		String scheme = uri.getScheme();
+		if ("http".equals(scheme) || "https".equals(scheme)) {
+			this.url = uri.toURL();
+		}
+		throw new MalformedURLException(
+			"URI does not point to an HTTP(S) location.");
+	}
+
+	// -- HTTPLocation methods --
+
+	/** Gets the associated {@link URL}. */
+	public URL getURL() {
+		return url;
+	}
+
+	// -- Location methods --
+
+	/**
+	 * Gets the associated {@link URI}, or null if this URL is not formatted
+	 * strictly according to to RFC2396 and cannot be converted to a URI.
+	 */
 	@Override
-	public Location createLocation() throws IOException {
-		// create and populate a temp file
-		final File tmpFile = File.createTempFile("URLHandleTest", "test-url");
-		tmpFile.deleteOnExit();
-		populateData(new FileOutputStream(tmpFile));
-		return new URLLocation(tmpFile.toURI().toURL());
+	public URI getURI() {
+		try {
+			return getURL().toURI();
+		}
+		catch (final URISyntaxException exc) {
+			return null;
+		}
 	}
 
 }
