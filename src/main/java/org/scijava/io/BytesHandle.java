@@ -124,7 +124,8 @@ public class BytesHandle extends AbstractDataHandle<BytesLocation> {
 		final int r = (int) available(1);
 		if (r <= 0) return -1;
 		try {
-			return bytes().get();
+			// we need to convert the bytes into the range 0-255
+			return 0xff & bytes().get();
 		}
 		catch (final BufferUnderflowException e) {
 			return -1;
