@@ -62,7 +62,7 @@ public class ScriptModule extends AbstractModule implements Contextual {
 
 	public static final String RETURN_VALUE = "result";
 
-	private final ScriptInfo info;
+	private ScriptInfo info;
 
 	@Parameter
 	private Context context;
@@ -140,6 +140,10 @@ public class ScriptModule extends AbstractModule implements Contextual {
 	@Override
 	public ScriptInfo getInfo() {
 		return info;
+	}
+    
+	public void setInfo(ScriptInfo newInfo) {
+		info = newInfo;
 	}
 
 	// -- Runnable methods --
